@@ -25,7 +25,7 @@ export default async function EquipmentPage({
   }
 
   return (
-    <div className="mx-auto max-w-2xl p-6">
+    <div className="mx-auto w-full max-w-2xl p-6">
       <Link href={`/gyms/${gymId}`} className="text-sm text-gray-500 underline">
         ← Back to gym
       </Link>
@@ -40,13 +40,21 @@ export default async function EquipmentPage({
               <p className="font-semibold">{item.name}</p>
               <p className="text-sm text-gray-500">{item.category}</p>
             </div>
-            <span
-              className={`rounded-full px-3 py-1 text-sm font-medium ${
-                statusStyles[item.status] ?? 'bg-gray-100 text-gray-800'
-              }`}
-            >
-              {item.status}
-            </span>
+            <div className="flex items-center gap-3">
+              <span
+                className={`rounded-full px-3 py-1 text-sm font-medium ${
+                  statusStyles[item.status] ?? 'bg-gray-100 text-gray-800'
+                }`}
+              >
+                {item.status}
+              </span>
+              <Link
+                href={`/gyms/${gymId}/report?equipment=${item.id}`}
+                className="text-sm text-gray-500 underline"
+              >
+                Report
+              </Link>
+            </div>
           </li>
         ))}
         {data?.length === 0 && (
