@@ -86,7 +86,9 @@ export default function ManageGym() {
         ← Your gyms
       </Link>
       <h1 className="mt-2 text-2xl font-bold">{gymName}</h1>
-
+      <Link href={`/manage/${gymId}/equipment`} className="mt-3 inline-block rounded-lg border px-4 py-2 text-sm">
+        Manage equipment
+      </Link>
       <div className="mt-6 flex items-center justify-between">
         <h2 className="text-lg font-semibold">Reports</h2>
         <label className="flex items-center gap-2 text-sm text-gray-500">
