@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import { unitLabels } from '@/lib/unitLabels'
 import ReportForm from './ReportForm'
 
 export default async function ReportPage({
@@ -17,6 +18,13 @@ export default async function ReportPage({
     .select('id, name')
     .eq('gym_id', gymId)
     .order('name')
+    .order('id')
+
+  const labels = unitLabels(equipment ?? [])
+  const options = (equipment ?? []).map((e) => ({
+    id: e.id,
+    name: labels.get(e.id) ?? e.name,
+  }))
 
   return (
     <main className="mx-auto w-full max-w-2xl p-6">
@@ -26,7 +34,7 @@ export default async function ReportPage({
       <h1 className="mb-4 mt-2 text-2xl font-bold">Report an issue</h1>
       <ReportForm
         gymId={gymId}
-        equipment={equipment ?? []}
+        equipment={options}
         preselected={preselected}
       />
     </main>

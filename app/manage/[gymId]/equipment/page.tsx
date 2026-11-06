@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import { unitLabels } from '@/lib/unitLabels'
 
 type Item = {
   id: number
@@ -24,6 +25,7 @@ export default function ManageEquipment() {
 
   // add form
   const [newName, setNewName] = useState('')
+  const [newQty, setNewQty] = useState(1)
   const [newCategory, setNewCategory] = useState('strength')
   const [adding, setAdding] = useState(false)
 
@@ -38,6 +40,7 @@ export default function ManageEquipment() {
       .select('id, name, category, status')
       .eq('gym_id', gymId)
       .order('name')
+      .order('id')
     if (error) return setError(error.message)
     setItems(data ?? [])
   }, [gymId])
@@ -66,14 +69,20 @@ export default function ManageEquipment() {
     e.preventDefault()
     setAdding(true)
     setError(null)
-    const { error } = await supabase.from('equipment').insert({
+
+    const qty = Math.min(Math.max(Math.floor(newQty) || 1, 1), 50)
+    const rows = Array.from({ length: qty }, () => ({
       gym_id: Number(gymId),
       name: newName.trim(),
       category: newCategory,
-    })
+    }))
+
+    const { error } = await supabase.from('equipment').insert(rows)
     setAdding(false)
     if (error) return setError(error.message)
+
     setNewName('')
+    setNewQty(1)
     loadItems()
   }
 
@@ -117,6 +126,7 @@ export default function ManageEquipment() {
 
   if (!gymName) return <p className="p-6">Loading...</p>
 
+  const labels = unitLabels(items)
   const field =
     'rounded-lg border bg-transparent p-2 text-sm [&>option]:text-black'
 
@@ -149,6 +159,15 @@ export default function ManageEquipment() {
             </option>
           ))}
         </select>
+        <input
+          type="number"
+          min={1}
+          max={50}
+          value={newQty}
+          onChange={(e) => setNewQty(Number(e.target.value))}
+          aria-label="Quantity"
+          className={`${field} w-20`}
+        />
         <button
           type="submit"
           disabled={adding}
@@ -197,7 +216,7 @@ export default function ManageEquipment() {
             ) : (
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="font-semibold">{item.name}</p>
+                  <p className="font-semibold">{labels.get(item.id) ?? item.name}</p>
                   <p className="text-sm text-gray-500">{item.category}</p>
                 </div>
                 <div className="flex items-center gap-3">

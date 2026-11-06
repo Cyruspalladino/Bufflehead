@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import { unitLabels } from '@/lib/unitLabels'
 import FloorPlan from '@/app/components/FloorPlanLoader'
 import type { FloorItem } from '@/app/components/FloorPlan'
 
@@ -22,15 +23,16 @@ export default function ManageLayout() {
       .eq('gym_id', gymId)
       .order('name')
     if (error) return setError(error.message)
-    setItems(
-      (data ?? []).map((r) => ({
-        id: r.id,
-        name: r.name,
-        status: r.status,
-        x: r.x_position === null ? null : Number(r.x_position),
-        y: r.y_position === null ? null : Number(r.y_position),
-      }))
-    )
+
+    const mapped = (data ?? []).map((r) => ({
+      id: r.id,
+      name: r.name,
+      status: r.status,
+      x: r.x_position === null ? null : Number(r.x_position),
+      y: r.y_position === null ? null : Number(r.y_position),
+    }))
+    const labels = unitLabels(mapped)
+    setItems(mapped.map((i) => ({ ...i, name: labels.get(i.id) ?? i.name })))
   }, [gymId])
 
   useEffect(() => {
